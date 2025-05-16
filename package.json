@@ -1,0 +1,15 @@
+{
+  "name": "dev_tinder",
+  "version": "1.0.0",
+  "description": "tinder for developers",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "author": "Venkatesh",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
