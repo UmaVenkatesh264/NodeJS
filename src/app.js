@@ -5,6 +5,7 @@ const userModel = require("./models/user")
 
 app.use(express.json())
 
+// POST 
 app.post("/signUp", async (req,res)=>{
     // const userObj = {
     //     firstName : "Jasprit",
@@ -21,6 +22,43 @@ app.post("/signUp", async (req,res)=>{
    }catch(err){
         res.status(400).send("Error: " + err.message)
    }
+})
+
+//GET
+app.get("/user", async (req,res)=>{
+    const userEmail = req.body.emailId;
+    try{
+        const user = await userModel.find({emailId: userEmail});
+        res.send(user);
+    }
+    catch(err){
+        res.status(400).send("Not found");
+    }
+})
+
+//DELETE
+app.delete("/user", async (req,res)=>{
+    const userId = req.body.userId;
+    try{
+        await userModel.findByIdAndDelete(userId);
+        res.send("User deleted successfully");
+    }
+    catch(err){
+        res.status(400).send("something went wrong");
+    }
+})
+
+//UPDATE
+app.patch("/user", async(req,res)=>{
+    const userId = req.body.userId;;
+    const data = req.body
+    try{
+        await userModel.findByIdAndUpdate({_id:userId}, data)
+        res.send("User updated successfully")
+    }
+    catch(err){
+        res.status(400).send("something went wrong");
+    }
 })
 
 connectDB()
