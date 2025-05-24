@@ -8,6 +8,7 @@ const bcrypt = require("bcrypt");
 const validator = require("validator");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const {userAuth} = require("./middlewares/auth")
 
 app.use(express.json())
 app.use(cookieParser());
@@ -56,9 +57,9 @@ app.post("/login", async(req,res)=>{
 
     if(isPasswordValid){
       // generating a token
-      const token = await jwt.sign({_id : user._id}, "DEV@Tinder$264");
+      const token = await jwt.sign({_id : user._id}, "DEV@Tinder$264" , {expiresIn : "1d"});
       // wrapping it inside a cookie
-      res.cookie("token", token);
+      res.cookie("token", token, {expires: new Date(Date.now() + 24 * 3600000)});
       res.send("Login Successful")
     }
     else{
@@ -71,23 +72,9 @@ app.post("/login", async(req,res)=>{
 })
 
 //GET
-app.get("/profile", async(req,res)=>{
+app.get("/profile", userAuth, async(req,res)=>{
     try{
-      const cookies = req.cookies;
-      const {token} = cookies;
-
-      if(!token){
-        throw new Error("Invalid Token");
-      }
-
-      const decodedMessage = await jwt.verify(token, "DEV@Tinder$264");
-      const {_id} = decodedMessage;
-
-      const user = await userModel.findById(_id);
-      if(!user){
-        throw new Error("User not found")
-      }
-
+      const user =  req.user;
       res.send(user);
     }
     catch(err){
@@ -95,61 +82,14 @@ app.get("/profile", async(req,res)=>{
    }
 })
 
-app.get("/user", async (req,res)=>{
-    const userEmail = req.body.emailId;
-    try{
-        const user = await userModel.find({emailId: userEmail});
-        res.send(user);
-    }
-    catch(err){
-        res.status(400).send("Not found");
-    }
-})
 
-//DELETE
-app.delete("/user", async (req,res)=>{
-    const userId = req.body.userId;
-    try{
-        await userModel.findByIdAndDelete(userId);
-        res.send("User deleted successfully");
-    }
-    catch(err){
-        res.status(400).send("something went wrong");
-    }
-})
 
-//UPDATE
-app.patch("/user/:userId", async (req, res) => {
-  const userId = req.params?.userId;
-  const data = req.body;
-
-  try {
-    const ALLOWED_UPDATES = ["photoUrl", "about", "gender", "age", "skills" , "lastName"];
-    const isUpdateAllowed = Object.keys(data).every((k) =>
-      ALLOWED_UPDATES.includes(k)
-    );
-    if (!isUpdateAllowed) {
-      throw new Error("Update not allowed");
-    }
-    if (Array.isArray(data.skills) && data.skills.length > 10) {
-    throw new Error("Skills cannot be more than 10");
-    }
-    const user = await userModel.findByIdAndUpdate({ _id: userId }, data, {
-      returnDocument: "after",
-      runValidators: true,
-    });
-    console.log(user);
-    res.send("User updated successfully");
-  } catch (err) {
-    res.status(400).send("UPDATE FAILED:" + err.message);
-  }
-});
 
 connectDB()
 .then(()=>{
-    console.log("DB connected");
+    console.log("DB connection established");
     app.listen(7777, ()=>{
-    console.log("server started");
+    console.log("server is successfully listening on port 7777");
 })
 })
 .catch((err)=>{
