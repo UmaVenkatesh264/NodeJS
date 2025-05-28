@@ -1,7 +1,7 @@
 const express = require("express");
 const authRouter = express.Router();
 
-const userModel = require("../models/user")
+const UserModel = require("../models/user")
 const {validateSignUpData} = require("../utils/validation");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
@@ -23,7 +23,7 @@ authRouter.post("/signUp", async (req,res)=>{
         const {firstName, lastName, emailId, password} = req.body;
         const passwordHash = await bcrypt.hash(password, 10);
 
-        const user = new userModel({
+        const user = new UserModel({
           firstName, lastName, emailId, password:passwordHash
         });
         await user.save();
@@ -41,7 +41,7 @@ authRouter.post("/login", async (req,res)=>{
         throw new Error("Email is not valid!");
     }
 
-    const user = await userModel.findOne({emailId : emailId});
+    const user = await UserModel.findOne({emailId : emailId});
     if(!user){
       throw new Error("Invalid Credentials");
     }
