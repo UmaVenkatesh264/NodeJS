@@ -27,7 +27,7 @@ authRouter.post("/signUp", async (req,res)=>{
           firstName, lastName, emailId, password:passwordHash
         });
         await user.save();
-        res.send("used added successfully")
+        res.send("user added successfully")
    }catch(err){
         res.status(400).send("Error: " + err.message)
    }
