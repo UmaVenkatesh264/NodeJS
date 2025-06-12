@@ -6,15 +6,58 @@ const { validateSignUpData } = require("../utils/validation");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
 
-authRouter.post("/signUp", async (req, res) => {
-  // const userObj = {
-  //     firstName : "Jasprit",
-  //     lastName : "Bumrah",
-  //     emailId : "jb93@gmail.com",
-  //     password : "Sanjana@143"
-  // }
-  // console.log(req.body);
 
+/**
+ * @swagger
+ * /signUp:
+ *   post:
+ *     summary: Register a new user
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - firstName
+ *               - lastName
+ *               - emailId
+ *               - password
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *                 example: Ben
+ *               lastName:
+ *                 type: string
+ *                 example: Stokes
+ *               emailId:
+ *                 type: string
+ *                 format: email
+ *                 example: stokesy@gmail.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: Stokesy@123
+ *     responses:
+ *       200:
+ *         description: User added successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: user added successfully
+ *                 data:
+ *                   type: object
+ *                   description: Created user data
+ *       400:
+ *         description: Bad request / validation failed
+ */
+authRouter.post("/signUp", async (req, res) => {
   try {
     // validation
     validateSignUpData(req);
